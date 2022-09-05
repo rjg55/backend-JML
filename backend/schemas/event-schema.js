@@ -31,10 +31,6 @@ const eventsSchema = new mongoose.Schema(
       required: true
     },
     avatar: {
-      type: String,
-      default: String
-    },
-    bio: {
       type: String
     },
     host: {
@@ -45,7 +41,8 @@ const eventsSchema = new mongoose.Schema(
       type: [ { id: String } ]
     },
     active: {
-      type: Boolean
+      type: Boolean,
+      default: true
     },
     group: {
       type: String
