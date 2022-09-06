@@ -1,4 +1,5 @@
 const app = require(`${__dirname}/../app.js`);
+const { request } = require("express");
 const mongoose = require("mongoose");
 
 const Groups = require(`${__dirname}/../schemas/group-schema.js`);
@@ -36,4 +37,11 @@ beforeEach(() => {
 });
 afterAll(() => {
   mongoose.connection.close().then(() => console.log("Closing connection"));
+});
+
+//test to test connection
+describe("GET /api/users", () => {
+  test("Testing connection to DB", () => {
+    return request(app).get("/api/users").expect(200);
+  });
 });
