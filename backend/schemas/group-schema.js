@@ -7,7 +7,7 @@ const groupSchema = new mongoose.Schema(
       required: true
     },
     category: {
-      type: [ { name: String } ],
+      type: String,
       required: true
     },
     description: {
@@ -17,8 +17,8 @@ const groupSchema = new mongoose.Schema(
     members: {
       type: [ { id: String } ]
     },
-    admins: {
-      type: [ { id: String } ]
+    admin: {
+      type: String
     },
 
     thanks: {
