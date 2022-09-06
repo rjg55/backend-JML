@@ -20,6 +20,7 @@ const groupSchema = new mongoose.Schema(
     admins: {
       type: [ { id: String } ]
     },
+
     thanks: {
       type: Number,
       default: 0

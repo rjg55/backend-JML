@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const eventsMessagesSchema = new mongoose.Schema(
   {
+
     username: {
       type: String,
       required: true
@@ -10,6 +11,7 @@ const eventsMessagesSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+
     eventTag: {
       type: String,
       required: true
