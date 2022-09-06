@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const eventsMessagesSchema = new mongoose.Schema(
   {
-    user: {
+
+    username: {
       type: String,
       required: true
     },
@@ -10,7 +11,8 @@ const eventsMessagesSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    tag: {
+
+    eventTag: {
       type: String,
       required: true
     }
@@ -18,4 +20,4 @@ const eventsMessagesSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Events-Messages', eventsMessagesSchema);
+module.exports = mongoose.model('EventsMessages', eventsMessagesSchema);

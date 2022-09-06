@@ -20,8 +20,10 @@ const groupSchema = new mongoose.Schema(
     admins: {
       type: [ { id: String } ]
     },
-    rating: {
-      type: [ Number ]
+
+    thanks: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }
