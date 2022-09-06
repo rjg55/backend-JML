@@ -114,7 +114,7 @@ const seedEvents = [
     coords: { lat: 53.47245, long: 21.23817 },
     startTime: '2022-09-03T17:07:43.438+00:00',
     endTime: '2022-09-03T18:07:43.438+00:00',
-    host: 'susu',
+    host: 'janester',
     guests: [],
     active: true,
     group: ''
@@ -127,7 +127,7 @@ const seedEvents = [
     coords: { lat: 58.47345, long: 4.29617 },
     startTime: '2022-09-03T17:07:43.438+00:00',
     endTime: '2022-09-03T18:07:43.438+00:00',
-    host: 'susu',
+    host: 'BigGreg',
     guests: [],
     active: true,
     group: ''
@@ -168,59 +168,59 @@ const seedGroups = [
     title: 'BigGregs Big Fun',
     category: 'hobbies',
     description: 'this is a description',
-    members: [ 'susu', 'Payney', 'janester' ],
-    admins: []
+    members: [],
+    admin: 'BigGreg'
   },
   {
     title: 'The outdoor people',
     category: 'outdoors',
     description: 'this is a description',
-    members: [ 'susu', 'Payney', 'janester' ],
-    admins: []
+    members: [],
+    admin: 'BigGreg'
   },
   {
     title: 'We like movies',
     category: 'daytrips',
     description: 'this is a description',
-    members: [ 'susu', 'Payney', 'janester' ],
-    admins: []
+    members: [],
+    admin: 'BigGreg'
   },
   {
-    title: 'BigGregs Big Fun',
+    title: 'Janesters small fun',
     category: 'hobbies',
     description: 'this is a description',
     members: [],
-    admins: [ 'BigGreg' ]
+    admin: 'janester'
   },
   {
     title: 'Film lovers unite',
     category: 'film',
     description: 'Friday film trips!',
     members: [],
-    admins: [ susu ]
+    admin: 'janester'
   },
   {
     title: 'Walking all over',
     category: 'sport',
     description: 'Walking club, we go on weekend trips to the Peak District',
-    members: [ 'JonnyBoy', 'Payney' ],
-    admins: [ 'JonnyBoy' ]
+    members: [],
+    admin: 'janester'
   }
 ];
 
 const seedEventMessages = [
   {
-    username: 'JonnyBoy',
+    userTag: 'BigGreg',
     message: 'this is a event comment to discuss things about the event',
-    eventTag: 'Walking all over'
+    eventTag: 'Unicycling crash course'
   },
   {
-    username: 'susu',
+    userTag: 'BigGreg',
     message: 'this is a event comment to discuss things about the event',
-    eventTag: 'Walking all over'
+    eventTag: 'Unicycling crash course'
   },
   {
-    username: 'janester',
+    userTag: 'janester',
     message: 'this is a event comment to discuss things about the event',
     eventTag: 'Unicycling crash course'
   }
@@ -231,10 +231,48 @@ seedDB = async () => {
   await Events.deleteMany({});
   await Groups.deleteMany({});
   await EventsMessages.deleteMany({});
+
   await Users.insertMany(seedUsers);
+  // request users id's
+  const janeUser = await Users.findOne({ username: 'janester' });
+  const gregUser = await Users.findOne({ username: 'BigGreg' });
+
+  seedEvents.forEach((event) => {
+    if (event.host === 'janester') {
+      event.host = janeUser._id;
+    } else {
+      event.host = gregUser._id;
+    }
+  });
+
   await Events.insertMany(seedEvents);
-  await Groups.insertMany(seedGroups);
+
+  const unicycleEvent = await Events.findOne({
+    title: 'Unicycling crash course'
+  });
+
+  seedEventMessages.forEach((msg) => {
+    if (msg.userTag === 'BigGreg') {
+      msg.userTag = gregUser._id;
+    }
+    if (msg.userTag === 'janester') {
+      msg.userTag = janeUser._id;
+    }
+    msg.eventTag = unicycleEvent._id;
+  });
+
   await EventsMessages.insertMany(seedEventMessages);
+
+  seedGroups.forEach((group) => {
+    if (group.admin === 'BigGreg') {
+      group.admin = gregUser._id;
+    }
+    if (group.userTag === 'janester') {
+      group.admin = janeUser._id;
+    }
+  });
+
+  await Groups.insertMany(seedGroups);
 };
 
 seedDB().then(() => {
