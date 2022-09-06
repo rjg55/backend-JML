@@ -1,29 +1,22 @@
 const app = require(`${__dirname}/../app.js`);
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { seedDB } = require(`${__dirname}/../seed.js`);
-const dotenv = require("dotenv");
-const request = require("supertest");
-
-const Groups = require(`${__dirname}/../schemas/group-schema.js`);
-const Events = require(`${__dirname}/../schemas/event-schema.js`);
-const Users = require(`${__dirname}/../schemas/user-schema.js`);
-const EventMessages = require(`${__dirname}/../schemas/event-message-schema.js`);
+const dotenv = require('dotenv');
+const request = require('supertest');
 
 dotenv.config({
-  path: `${__dirname}/../.env.test`,
+  path: `${__dirname}/../.env.test`
 });
 
 beforeAll(async () => {
   connection = await mongoose
     .connect(process.env.MONGO_URI)
     .then(() => {
-      console.log("Connected, seeding.");
+      console.log('Connected, seeding.');
     })
     .catch((err) => {
       console.log(err);
     });
-  //   db = await connection.db(globalThis.__MONGO_DB_NAME__);
-  //Might need this ^^^^^
 });
 
 beforeEach(() => {
@@ -34,8 +27,23 @@ afterAll(() => {
 });
 
 // test to test connection
-describe("GET /api/users", () => {
-  test("Testing connection to DB", () => {
-    return request(app).get("/api/users").expect(200);
+describe('\nGET /api/users\n', () => {
+  test('returns a user object containing the properties set by the schema', () => {
+    return request(app).get('/api/users').expect(200).then(({ body }) => {
+      expect(Array.isArray(body.users)).toBe(true);
+      expect(body.users.length).toBeGreaterThan(0);
+      body.users.forEach((user) => {
+        expect.objectContaining({
+          _id: expect.any(String),
+          firstName: expect.any(String),
+          lastName: expect.any(String),
+          username: expect.any(String),
+          password: expect.any(String),
+          email: expect.any(String),
+          phoneNumber: expect.any(String),
+          dateOfBirth: expect.any(String)
+        });
+      });
+    });
   });
 });
