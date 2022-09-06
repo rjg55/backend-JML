@@ -1,0 +1,35 @@
+{
+  "name": "final-project",
+  "version": "1.0.0",
+  "description": "Team Jest my Luck's final project",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "node backend/server.js",
+    "server": "nodemon backend/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rjg55/Final-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rjg55/Final-Project/issues"
+  },
+  "homepage": "https://github.com/rjg55/Final-Project#readme",
+  "dependencies": {
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "fs.promises": "^0.1.2",
+    "mongoose": "^6.5.4"
+  },
+  "devDependencies": {
+    "jest": "^29.0.2",
+    "jest-extended": "^3.1.0",
+    "jest-sorted": "^1.0.14",
+    "supertest": "^6.2.4",
+    "nodemon": "^2.0.19"
+  }
+}
