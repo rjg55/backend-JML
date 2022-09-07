@@ -39,15 +39,17 @@ describe("GET", () => {
           expect(Array.isArray(body.groups)).toBe(true);
           expect(body.groups.length).toBeGreaterThan(0);
           body.groups.forEach((group) => {
-            expect.objectContaining({
-              _id: expect.any(String),
-              title: expect.any(String),
-              category: expect.any(String),
-              description: expect.any(String),
-              members: expect.anything,
-              admin: expect.any(String),
-              thanks: expect.any(String),
-            });
+            expect(group).toEqual(
+              expect.objectContaining({
+                _id: expect.any(String),
+                title: expect.any(String),
+                category: expect.any(String),
+                description: expect.any(String),
+                members: expect.anything(),
+                admin: expect.any(String),
+                thanks: expect.any(Number),
+              })
+            );
           });
         });
     });
@@ -172,7 +174,7 @@ describe("/api/groups/:id", () => {
           expect(body.group._id).toEqual(String(firstGroupId));
         });
     });
-    test.only("status 200: returns a group object with a specific ID and correct properties", async () => {
+    test("status 200: returns a group object with a specific ID and correct properties", async () => {
       const allGroups = await Groups.find({});
       const firstGroupId = String(allGroups[0]._id);
 
@@ -187,7 +189,7 @@ describe("/api/groups/:id", () => {
               title: expect.any(String),
               category: expect.any(String),
               description: expect.any(String),
-              members: expect.anything,
+              members: expect.anything(),
               member_count: expect.any(Number),
               admin: expect.any(String),
               thanks: expect.any(Number),
