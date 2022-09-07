@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { seedDB } = require(`${__dirname}/../seed.js`);
 const dotenv = require("dotenv");
 const request = require("supertest");
+const Events = require(`${__dirname}/../schemas/event-schema.js`);
 
 dotenv.config({
   path: `${__dirname}/../.env.test`,
@@ -27,7 +28,7 @@ afterAll(() => {
 });
 
 describe("GET /api/events", () => {
-  test("returns an events object containing the properties set by the schema", () => {
+  test("200: returns an events object containing the properties set by the schema", () => {
     return request(app)
       .get("/api/events")
       .expect(200)
@@ -71,7 +72,6 @@ describe("GET /api/events", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.events.length).toBeGreaterThan(0);
-        console.log(body.events);
         body.events.forEach((event) => {
           expect(event.category).toBe("sport");
         });
@@ -107,22 +107,106 @@ describe("GET /api/events", () => {
         });
       });
   });
-  // describe("GET /api/events/:event_id", () => {
-  //   test("returns a specific event object with correct properties", () => {
+});
 
-  //     const allEvents = await Events.find({});
-  //     const firstEventId = allEvents[0]._id
+describe("GET /api/events/:event_id", () => {
+  test("200: returns a specific event object with correct properties", async () => {
+    const allEvents = await Events.find({});
+    const firstEventId = allEvents[0]._id;
+    return request(app)
+      .get(`/api/events/${firstEventId}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.event).toEqual({
+          _id: String(firstEventId),
+          title: "Off Road Biking",
+          category: "outdoors",
+          description: "Riding mountain bikes",
+          location: "Lake District",
+          coords: { lat: 53.47223, long: -2.23817 },
+          startTime: "2022-09-03T17:07:43.438Z",
+          endTime: "2022-09-03T18:07:43.438Z",
+          host: expect.any(String),
+          guests: [],
+          active: true,
+          group: "",
+          __v: 0,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+        });
+      });
+  });
+});
 
-  //     return request(app)
-  //       .get(`/api/events/${firstEventId}`)
-  //       .expect(200)
-  //       .then(({ body }) => {
-  //           expect(body).toEqual({
-  //             _id: firstEventId,
-  //             title: "Hello"
+describe("POST /api/events/", () => {
+  test("201: adds event to the database and responds with newly created event", async () => {
+    const newEvent = {
+      title: "Test Event",
+      category: "Test",
+      description: "This is a test event",
+      location: "Jest",
+      coords: { lat: 50.0, long: 0.0 },
+      startTime: "2022-09-03T17:07:43.438Z",
+      endTime: "2022-09-03T18:07:43.438Z",
+      host: "TestHostID1234",
+      guests: [],
+      active: true,
+      group: "",
+    };
+    return request(app)
+      .post(`/api/events/`)
+      .send(newEvent)
+      .expect(201)
+      .then((res) => {
+        const postedEvent = res.body.event;
+        expect(postedEvent).toEqual(
+          expect.objectContaining({
+            title: "Test Event",
+            category: "Test",
+            description: "This is a test event",
+            location: "Jest",
+            coords: { lat: 50.0, long: 0.0 },
+            startTime: "2022-09-03T17:07:43.438Z",
+            endTime: "2022-09-03T18:07:43.438Z",
+            host: "TestHostID1234",
+            guests: [],
+            active: true,
+            group: "",
+          })
+        );
+      });
+  });
+});
 
-  //           });
-  //         });
-  //       });
-  //   });
+describe("DELETE: /api/events/:event_id", () => {
+  test("204: responds with 204 and returns nothing", async () => {
+    const allEvents = await Events.find({});
+    const firstEventId = allEvents[0]._id;
+    return request(app).delete(`/api/events/${firstEventId}`).expect(204);
+  });
+});
+
+describe.only("PATCH /api/events/:event_id", () => {
+  test("200, responds with the updated event", async () => {
+    const editEvent = {
+      title: "Test Event",
+      category: "Test",
+      description: "This is a test event",
+    };
+    const allEvents = await Events.find({});
+    const firstEventId = allEvents[0]._id;
+    return request(app)
+      .patch(`/api/events/${firstEventId}`)
+      .send(editEvent)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.event).toEqual(
+          expect.objectContaining({
+            title: "Test Event",
+            category: "Test",
+            description: "This is a test event",
+          })
+        );
+      });
+  });
 });
