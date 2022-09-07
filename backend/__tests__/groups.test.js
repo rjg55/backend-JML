@@ -102,26 +102,29 @@ describe("GET", () => {
           });
       });
     });
-    describe("SORTBY - error handling", () => {
-      test("status 400 - bad request - column does not exist", () => {
-        return request(app)
-          .get("/api/groups?sortby=battenberg")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body).toEqual({ msg: "Bad request" });
+    test("return an array of only those groups with a category of outdoors", () => {
+      return request(app)
+        .get("/api/groups?category=outdoors")
+        .expect(200)
+        .then(({ body: { groups } }) => {
+          groups.forEach((group) => {
+            expect(group.category).toBe("outdoors");
           });
-      });
-      test("status 400 - bad request - column does not exist", () => {
-        return request(app)
-          .get("/api/groups?sortby=battenberg")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body).toEqual({ msg: "Bad request" });
-          });
-      });
+        });
     });
+  });
+  describe("SORTBY - error handling", () => {
+    test("status 400 - bad request - column does not exist", () => {
+      return request(app)
+        .get("/api/groups?sortby=battenberg")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ msg: "Bad request" });
+        });
+    });
+
     describe("ORDER", () => {
-      test("should return groups sorted by default in descending order", () => {
+      test("should return groups sorted in descending order (sort_by set to default)", () => {
         return request(app)
           .get("/api/groups?order=desc")
           .expect(200)
