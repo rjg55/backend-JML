@@ -26,27 +26,134 @@ afterAll(() => {
   mongoose.connection.close();
 });
 
-// test to test connection
-// describe("\nGET /api/users\n", () => {
-//   test("returns a user object containing the properties set by the schema", () => {
-//     return request(app)
-//       .get("/api/users")
-//       .expect(200)
-//       .then(({ body }) => {
-//         expect(Array.isArray(body.users)).toBe(true);
-//         expect(body.users.length).toBeGreaterThan(0);
-//         body.users.forEach((user) => {
-//           expect.objectContaining({
-//             _id: expect.any(String),
-//             firstName: expect.any(String),
-//             lastName: expect.any(String),
-//             username: expect.any(String),
-//             password: expect.any(String),
-//             email: expect.any(String),
-//             phoneNumber: expect.any(String),
-//             dateOfBirth: expect.any(String),
-//           });
-//         });
-//       });
-//   });
-// });
+// test("return something", () => {});
+
+describe("GET", () => {
+  describe("status 200: returns all groups", () => {
+    test("returns an array of all group objects", () => {
+      return request(app)
+        .get("/api/groups")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.groups)).toBe(true);
+          expect(body.groups.length).toBeGreaterThan(0);
+          body.groups.forEach((group) => {
+            expect.objectContaining({
+              _id: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              description: expect.any(String),
+              members: expect.anything,
+              admin: expect.any(String),
+              thanks: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+  describe("Queries", () => {
+    describe("SORTBY", () => {
+      test("return an array of groups sorted by title - a-z", () => {
+        return request(app)
+          .get("/api/groups?sortby=title")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("title");
+          });
+      });
+      test("return an array of groups sorted by category - a-z", () => {
+        return request(app)
+          .get("/api/groups?sortby=category")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("category");
+          });
+      });
+      test("return an array of groups sorted by description - a-z", () => {
+        return request(app)
+          .get("/api/groups?sortby=description")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("description");
+          });
+      });
+      test("return an array of groups sorted by no. of members", () => {
+        return request(app)
+          .get("/api/groups?sortby=member_count")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("member_count");
+          });
+      });
+      test("return an array of groups sorted by admin - a-z", () => {
+        return request(app)
+          .get("/api/groups?sortby=admin")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("admin");
+          });
+      });
+      test("return an array of groups sorted by thanks - a-z", () => {
+        return request(app)
+          .get("/api/groups?sortby=thanks")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("thanks");
+          });
+      });
+    });
+    test("return an array of only those groups with a category of outdoors", () => {
+      return request(app)
+        .get("/api/groups?category=outdoors")
+        .expect(200)
+        .then(({ body: { groups } }) => {
+          groups.forEach((group) => {
+            expect(group.category).toBe("outdoors");
+          });
+        });
+    });
+  });
+  describe("SORTBY - error handling", () => {
+    test("status 400 - bad request - column does not exist", () => {
+      return request(app)
+        .get("/api/groups?sortby=battenberg")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ msg: "Bad request" });
+        });
+    });
+
+    describe("ORDER", () => {
+      test("should return groups sorted in descending order (sort_by set to default)", () => {
+        return request(app)
+          .get("/api/groups?order=desc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("member_count", {
+              descending: true,
+            });
+          });
+      });
+      test("should return groups sorted by member_count in descending order", () => {
+        return request(app)
+          .get("/api/groups?sortby=member_count&order=desc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("member_count", {
+              descending: true,
+            });
+          });
+      });
+    });
+    describe("ORDER - error handling", () => {
+      test("status 400 - bad request - invalid order query", () => {
+        return request(app)
+          .get("/api/groups?sortby=member_count&order=decreasing")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).toEqual({ msg: "Bad request" });
+          });
+      });
+    });
+  });
+});

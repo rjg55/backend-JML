@@ -6,6 +6,11 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handleValidationErrors = (err, req, res, next) => {
   if (err.message) {
-    res.status(400).send({ msg: err.message });
+    res.status(400).send({ message: err.message });
   } else next(err);
+};
+
+exports.genericError = (err, req, res) => {
+  console.log(err);
+  res.status(500).send({ message: "Something went wrong" });
 };
