@@ -209,13 +209,15 @@ describe("/api/groups/:id", () => {
     return request(app)
       .get(`/api/groups/123456`)
       .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad request");
+      .then(({ text }) => {
+        expect(text).toBe(
+          'Cast to ObjectId failed for value "123456" (type string) at path "_id" for model "Group"'
+        );
       });
   });
 });
 
-describe.only(" POST /api/groups", () => {
+describe(" POST /api/groups", () => {
   test("Returns a status of 201 and newly added group object", () => {
     const addGroup = {
       title: "Cow Lovers",
@@ -252,8 +254,12 @@ describe.only(" POST /api/groups", () => {
       .post("/api/groups")
       .send(addGroup)
       .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad request");
+      .then(({ text }) => {
+        expect(text).toBe("Path `title` is required.");
       });
   });
+});
+
+describe("PATCH /api/groups", () => {
+  test("status 200: updates a group with specific ID", () => {});
 });

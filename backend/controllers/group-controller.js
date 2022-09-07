@@ -28,5 +28,9 @@ exports.postGroup = (req, res, next) => {
     .then((newGroup) => {
       res.status(201).send({ newGroup });
     })
-    .catch(next);
+    .catch((err) => {
+      let allErrors = Object.keys(err.errors);
+      let firstError = allErrors[0];
+      next(err.errors[firstError].properties);
+    });
 };
