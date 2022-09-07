@@ -37,7 +37,7 @@ describe('\nGET all /api/event-messages/event/:event_id\n', () => {
       .get(`/api/event-messages/events/${event_id}`)
       .expect(200)
       .then(({ body }) => {
-        expect(Array.isArray(body)).toBe(true);
+        expect(Array.isArray(body.messages)).toBe(true);
       });
   });
   test('returns an object containing a user id, message, event id and createdAt property', async () => {
@@ -47,7 +47,7 @@ describe('\nGET all /api/event-messages/event/:event_id\n', () => {
       .get(`/api/event-messages/events/${event_id}`)
       .expect(200)
       .then(({ body }) => {
-        body.forEach(() => {
+        body.messages.forEach(() => {
           expect.objectContaining({
             _id: expect.any(String),
             userTag: expect.any(String),
@@ -65,7 +65,7 @@ describe('\nGET all /api/event-messages/event/:event_id\n', () => {
       .get(`/api/event-messages/events/${event_id}`)
       .expect(200)
       .then(({ body }) => {
-        expect(body).toBeSortedBy('createdAt', { descending: true });
+        expect(body.messages).toBeSortedBy('createdAt', { descending: true });
       });
   });
 });
@@ -80,7 +80,7 @@ describe('\nPOST new message on an event /api/event-messages/event/:event_id', (
       .send({ userTag: 'test', message: 'test' })
       .expect(201)
       .then(({ body }) => {
-        expect(body).toEqual(
+        expect(body.message).toEqual(
           expect.objectContaining({
             _id: expect.any(String),
             userTag: 'test',

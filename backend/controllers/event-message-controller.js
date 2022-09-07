@@ -9,7 +9,7 @@ exports.getAllMessagesByEventId = (req, res, next) => {
   const { event_id } = req.params;
   fetchAllEventMessages(event_id)
     .then((messages) => {
-      res.status(200).send(messages);
+      res.status(200).send({ messages });
     })
     .catch(next);
 };
@@ -20,7 +20,7 @@ exports.addMessage = (req, res, next) => {
   const newMessage = req.body;
   insertMessage(event_id, newMessage)
     .then((message) => {
-      res.status(201).send(message);
+      res.status(201).send({ message });
     })
     .catch((err) => {
       console.log(err);
