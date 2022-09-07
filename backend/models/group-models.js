@@ -1,18 +1,24 @@
 const Groups = require(`${__dirname}/../schemas/group-schema.js`);
 const fs = require("fs/promises");
 
-exports.fetchAllGroups = async (sortby = "members") => {
+exports.fetchAllGroups = async (sortby = "member_count", order = "asc") => {
   const validSortby = [
     "title",
     "category",
     "description",
-    "members",
+    "member_count",
     "admin",
     "thanks",
   ];
 
-  if (validSortby.includes(sortby)) {
-    const groupData = await Groups.find({}).sort(sortby);
+  const validOrder = ["asc", "desc"];
+
+  if (validSortby.includes(sortby) && validOrder.includes(order)) {
+    let orderQuery = 1;
+    if (order === "desc") {
+      orderQuery = -1;
+    }
+    const groupData = await Groups.find({}).sort([[sortby, orderQuery]]);
     return groupData;
   } else {
     return Promise.reject({ status: 400, msg: "Bad request" });

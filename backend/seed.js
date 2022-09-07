@@ -156,6 +156,7 @@ const seedGroups = [
     category: "hobbies",
     description: "this is a description",
     members: [{ id: "blue" }],
+    member_count: 1,
     admin: "BigGreg",
   },
   {
@@ -163,6 +164,7 @@ const seedGroups = [
     category: "outdoors",
     description: "this is a description",
     members: [{ id: "blue" }, { id: "red" }],
+    member_count: 2,
     admin: "BigGreg",
   },
   {
@@ -170,6 +172,7 @@ const seedGroups = [
     category: "daytrips",
     description: "this is a description",
     members: [{ id: "blue" }, { id: "red" }, { id: "yellow" }],
+    member_count: 3,
     admin: "BigGreg",
   },
   {
@@ -187,6 +190,7 @@ const seedGroups = [
       { id: "yewycecn" },
       { id: "gary" },
     ],
+    member_count: 9,
     admin: "janester",
   },
   {
@@ -203,6 +207,7 @@ const seedGroups = [
       { id: "yiuo" },
       { id: "yewycecn" },
     ],
+    member_count: 8,
     admin: "janester",
   },
   {
@@ -210,6 +215,7 @@ const seedGroups = [
     category: "sport",
     description: "Walking club, we go on weekend trips to the Peak District",
     members: [],
+    member_count: 0,
     admin: "janester",
   },
 ];

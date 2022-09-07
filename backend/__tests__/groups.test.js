@@ -77,12 +77,12 @@ describe("GET", () => {
             expect(body.groups).toBeSortedBy("description");
           });
       });
-      test.skip("return an array of groups sorted by members - a-z", () => {
+      test("return an array of groups sorted by no. of members", () => {
         return request(app)
-          .get("/api/groups?sortby=members")
+          .get("/api/groups?sortby=member_count")
           .expect(200)
           .then(({ body }) => {
-            expect(body.groups).toBeSortedBy("members", { descending: true });
+            expect(body.groups).toBeSortedBy("member_count");
           });
       });
       test("return an array of groups sorted by admin - a-z", () => {
@@ -108,7 +108,6 @@ describe("GET", () => {
           .get("/api/groups?sortby=battenberg")
           .expect(400)
           .then(({ body }) => {
-            console.log(body);
             expect(body).toEqual({ msg: "Bad request" });
           });
       });
@@ -117,7 +116,38 @@ describe("GET", () => {
           .get("/api/groups?sortby=battenberg")
           .expect(400)
           .then(({ body }) => {
-            console.log(body);
+            expect(body).toEqual({ msg: "Bad request" });
+          });
+      });
+    });
+    describe("ORDER", () => {
+      test("should return groups sorted by default in descending order", () => {
+        return request(app)
+          .get("/api/groups?order=desc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("member_count", {
+              descending: true,
+            });
+          });
+      });
+      test("should return groups sorted by member_count in descending order", () => {
+        return request(app)
+          .get("/api/groups?sortby=member_count&order=desc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.groups).toBeSortedBy("member_count", {
+              descending: true,
+            });
+          });
+      });
+    });
+    describe("ORDER - error handling", () => {
+      test("status 400 - bad request - invalid order query", () => {
+        return request(app)
+          .get("/api/groups?sortby=member_count&order=decreasing")
+          .expect(400)
+          .then(({ body }) => {
             expect(body).toEqual({ msg: "Bad request" });
           });
       });
