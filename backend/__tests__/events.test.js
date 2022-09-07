@@ -176,6 +176,18 @@ describe("POST /api/events/", () => {
         );
       });
   });
+  test("400: throws error when input is incomplete", async () => {
+    const newEvent = {
+      title: "Test Event",
+    };
+    return request(app)
+      .post(`/api/events/`)
+      .send(newEvent)
+      .expect(400)
+      .then((result) => {
+        expect(result.text).toEqual("Path `host` is required.");
+      });
+  });
 });
 
 describe("DELETE: /api/events/:event_id", () => {
