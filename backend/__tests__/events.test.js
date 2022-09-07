@@ -186,7 +186,7 @@ describe("DELETE: /api/events/:event_id", () => {
   });
 });
 
-describe.only("PATCH /api/events/:event_id", () => {
+describe("PATCH /api/events/:event_id", () => {
   test("200, responds with the updated event", async () => {
     const editEvent = {
       title: "Test Event",
