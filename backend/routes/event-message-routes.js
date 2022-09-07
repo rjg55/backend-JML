@@ -1,11 +1,15 @@
-const eventMessageRouter = require("express").Router();
+const eventMessageRouter = require('express').Router();
 
-///////////REQUIRE IN CONTROLLER FUNCTIONS HERE\\\\\\\\\
+// REQUIRE IN CONTROLLER FUNCTIONS HERE
 const {
-  getAllEventMessages,
-} = require("../controllers/event-message-controller");
+  getAllMessagesByEventId,
+  addMessage
+} = require('../controllers/event-message-controller');
 
-/////////Put endpoints here\\\\\\\\\\\\\\\\\
-eventMessageRouter.get("/", getAllEventMessages);
+// Put endpoints here
+eventMessageRouter
+  .route('/events/:event_id')
+  .get(getAllMessagesByEventId)
+  .post(addMessage);
 
 module.exports = eventMessageRouter;
