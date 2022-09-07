@@ -55,5 +55,13 @@ exports.fetchAllGroups = async (
 
 exports.fetchGroupById = async (group_id) => {
   const groupById = await Groups.find({ _id: group_id });
+
+  if (groupById.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "Not found",
+    });
+  }
+
   return groupById[0];
 };

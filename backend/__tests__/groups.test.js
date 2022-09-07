@@ -182,7 +182,6 @@ describe("/api/groups/:id", () => {
         .get(`/api/groups/${firstGroupId}`)
         .expect(200)
         .then(({ body: { group } }) => {
-          console.log(group);
           expect(group).toEqual(
             expect.objectContaining({
               _id: expect.any(String),
@@ -197,5 +196,21 @@ describe("/api/groups/:id", () => {
           );
         });
     });
+  });
+  test("Returns a status of 404 when given an ID which does not exist", () => {
+    return request(app)
+      .get(`/api/groups/123456789012345678901234`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+  test("Returns a status of 400 when given an invalid ID", () => {
+    return request(app)
+      .get(`/api/groups/123456`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
   });
 });
