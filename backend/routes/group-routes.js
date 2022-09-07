@@ -4,10 +4,12 @@ const groupRouter = require("express").Router();
 const {
   getAllGroups,
   getGroupById,
+  postGroup,
 } = require("../controllers/group-controller");
 
 /////////Put endpoints here\\\\\\\\\\\\\\\\\
 groupRouter.get("/", getAllGroups);
 groupRouter.get("/:group_id", getGroupById);
+groupRouter.post("/", postGroup);
 
 module.exports = groupRouter;

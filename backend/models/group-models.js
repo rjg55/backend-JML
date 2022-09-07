@@ -65,3 +65,12 @@ exports.fetchGroupById = async (group_id) => {
 
   return groupById[0];
 };
+
+exports.addGroup = (title, category, description, admin) => {
+  return Groups.create({
+    title,
+    category,
+    description,
+    admin,
+  });
+};

@@ -214,3 +214,46 @@ describe("/api/groups/:id", () => {
       });
   });
 });
+
+describe.only(" POST /api/groups", () => {
+  test("Returns a status of 201 and newly added group object", () => {
+    const addGroup = {
+      title: "Cow Lovers",
+      category: "leisure",
+      description: "We love cows and tipping them",
+      admin: "Cowpoke123",
+    };
+    return request(app)
+      .post("/api/groups")
+      .send(addGroup)
+      .expect(201)
+      .then(({ body: { newGroup } }) => {
+        expect(newGroup).toEqual(
+          expect.objectContaining({
+            _id: expect.any(String),
+            title: expect.any(String),
+            category: expect.any(String),
+            description: expect.any(String),
+            members: expect.anything(),
+            member_count: expect.any(Number),
+            admin: expect.any(String),
+            thanks: expect.any(Number),
+          })
+        );
+      });
+  });
+  test("Returns a status 400 when given a malformed body/missing fields/incorrect type", () => {
+    const addGroup = {
+      category: "leisure",
+      description: "We love cows and tipping them",
+      admin: "Cowpoke123",
+    };
+    return request(app)
+      .post("/api/groups")
+      .send(addGroup)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});

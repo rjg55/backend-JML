@@ -1,6 +1,8 @@
-const { fetchGroupById } = require("../models/group-models");
-
-const { fetchAllGroups } = require(`${__dirname}/../models/group-models.js`);
+const {
+  fetchAllGroups,
+  fetchGroupById,
+  addGroup,
+} = require(`${__dirname}/../models/group-models.js`);
 
 exports.getAllGroups = (req, res, next) => {
   const { sortby, order, category } = req.query;
@@ -16,6 +18,15 @@ exports.getGroupById = (req, res, next) => {
   fetchGroupById(group_id)
     .then((group) => {
       res.status(200).send({ group: group });
+    })
+    .catch(next);
+};
+
+exports.postGroup = (req, res, next) => {
+  const { title, category, description, admin } = req.body;
+  addGroup(title, category, description, admin)
+    .then((newGroup) => {
+      res.status(201).send({ newGroup });
     })
     .catch(next);
 };
