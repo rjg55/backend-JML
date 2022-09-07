@@ -1,21 +1,21 @@
 const app = require(`${__dirname}/../app.js`);
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { seedDB } = require(`${__dirname}/../seed.js`);
-const dotenv = require('dotenv');
-const request = require('supertest');
-require('jest-sorted');
-const EventsMessages = require('../schemas/event-message-schema');
-const Events = require('../schemas/event-schema');
+const dotenv = require("dotenv");
+const request = require("supertest");
+require("jest-sorted");
+const EventsMessages = require("../schemas/event-message-schema");
+const Events = require("../schemas/event-schema");
 
 dotenv.config({
-  path: `${__dirname}/../.env.test`
+  path: `${__dirname}/../.env.test`,
 });
 
 beforeAll(async () => {
   connection = await mongoose
     .connect(process.env.MONGO_URI)
     .then(() => {
-      console.log('Connected, seeding.');
+      console.log("Connected, seeding.");
     })
     .catch((err) => {
       console.log(err);
@@ -29,8 +29,8 @@ afterAll(() => {
   mongoose.connection.close();
 });
 
-describe('\nGET all /api/event-messages/event/:event_id\n', () => {
-  test('returns an array of messages bu event id', async () => {
+describe("\nGET all /api/event-messages/event/:event_id\n", () => {
+  test("returns an array of messages bu event id", async () => {
     const event = await Events.find({});
     const event_id = event[0]._id;
     return request(app)
@@ -40,7 +40,7 @@ describe('\nGET all /api/event-messages/event/:event_id\n', () => {
         expect(Array.isArray(body.messages)).toBe(true);
       });
   });
-  test('returns an object containing a user id, message, event id and createdAt property', async () => {
+  test("returns an object containing a user id, message, event id and createdAt property", async () => {
     const event = await Events.find({});
     const event_id = event[0]._id;
     return request(app)
@@ -53,42 +53,64 @@ describe('\nGET all /api/event-messages/event/:event_id\n', () => {
             userTag: expect.any(String),
             message: expect.any(String),
             eventTag: expect.any(String),
-            createdAt: expect.any(String)
+            createdAt: expect.any(String),
           });
         });
       });
   });
-  test('returns an array of messages sorted by most recently created', async () => {
+  test("returns an array of messages sorted by most recently created", async () => {
     const event = await Events.find({});
     const event_id = event[0]._id;
     return request(app)
       .get(`/api/event-messages/events/${event_id}`)
       .expect(200)
       .then(({ body }) => {
-        expect(body.messages).toBeSortedBy('createdAt', { descending: true });
+        expect(body.messages).toBeSortedBy("createdAt", { descending: true });
       });
   });
 });
 
-describe('\nPOST new message on an event /api/event-messages/event/:event_id', () => {
-  test('adds a message to an event', async () => {
+describe("POST new message on an event /api/event-messages/event/:event_id", () => {
+  test("adds a message to an event", async () => {
     const events = await Events.find({});
     const event = events[0]._id;
 
     return request(app)
       .post(`/api/event-messages/events/${event}`)
-      .send({ userTag: 'test', message: 'test' })
+      .send({ userTag: "test", message: "test" })
       .expect(201)
       .then(({ body }) => {
         expect(body.message).toEqual(
           expect.objectContaining({
             _id: expect.any(String),
-            userTag: 'test',
-            message: 'test',
+            userTag: "test",
+            message: "test",
             eventTag: expect.any(String),
-            createdAt: expect.any(String)
+            createdAt: expect.any(String),
           })
         );
       });
+  });
+  test("ERROR 422: will not post empty comment", async () => {
+    const events = await Events.find({});
+    const event = events[0]._id;
+
+    return request(app)
+      .post(`/api/event-messages/events/${event}`)
+      .send({ userTag: "test", message: "" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Path `message` is required.");
+      });
+  });
+});
+
+describe("DELETE: /api/events-messages/:id", () => {
+  test("204: responds with 204 and returns nothing", async () => {
+    const allMessages = await EventsMessages.find({});
+    const firstMessageId = allMessages[0]._id;
+    return request(app)
+      .delete(`/api/event-messages/${firstMessageId}`)
+      .expect(204);
   });
 });

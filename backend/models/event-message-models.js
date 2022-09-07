@@ -1,4 +1,4 @@
-const EventsMessages = require('../schemas/event-message-schema');
+const EventsMessages = require("../schemas/event-message-schema");
 
 fetchAllEventMessages = () => {
   return EventsMessages.find({}).sort({ createdAt: -1 });
@@ -13,8 +13,13 @@ insertMessage = (id, newMessage) => {
   return EventsMessages.create({ eventTag: id, userTag, message });
 };
 
+removeMessage = (id) => {
+  return EventsMessages.findByIdAndDelete(id);
+};
+
 module.exports = {
   fetchAllEventMessages,
   fetchEventMessageById,
-  insertMessage
+  insertMessage,
+  removeMessage,
 };

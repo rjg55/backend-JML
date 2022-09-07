@@ -1,7 +1,7 @@
 const {
   fetchAllEventMessages,
-  fetchEventMessageById,
-  insertMessage
+  insertMessage,
+  removeMessage,
 } = require(`../models/event-message-models`);
 
 // GET all event messages by event Id
@@ -11,7 +11,9 @@ exports.getAllMessagesByEventId = (req, res, next) => {
     .then((messages) => {
       res.status(200).send({ messages });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err.errors.message.properties);
+    });
 };
 
 //POST comment
@@ -23,7 +25,18 @@ exports.addMessage = (req, res, next) => {
       res.status(201).send({ message });
     })
     .catch((err) => {
-      console.log(err);
-      next();
+      next(err.errors.message.properties);
+    });
+};
+
+exports.deleteMessage = (req, res, next) => {
+  const { id } = req.params;
+  console.log(id);
+  removeMessage(id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err.errors.message.properties);
     });
 };
