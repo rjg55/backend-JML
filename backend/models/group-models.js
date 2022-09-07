@@ -52,3 +52,8 @@ exports.fetchAllGroups = async (
   }
   return groupData;
 };
+
+exports.fetchGroupById = async (group_id) => {
+  const groupById = await Groups.find({ _id: group_id });
+  return groupById[0];
+};

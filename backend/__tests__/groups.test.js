@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { seedDB } = require(`${__dirname}/../seed.js`);
 const dotenv = require("dotenv");
 const request = require("supertest");
+const Groups = require(`../schemas/group-schema`);
 
 dotenv.config({
   path: `${__dirname}/../.env.test`,
@@ -154,6 +155,45 @@ describe("GET", () => {
             expect(body).toEqual({ msg: "Bad request" });
           });
       });
+    });
+  });
+});
+
+describe("/api/groups/:id", () => {
+  describe("GET", () => {
+    test("status 200: returns a group object with a specific ID", async () => {
+      const allGroups = await Groups.find({});
+      const firstGroupId = allGroups[0]._id;
+
+      return request(app)
+        .get(`/api/groups/${firstGroupId}`)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.group._id).toEqual(String(firstGroupId));
+        });
+    });
+    test.only("status 200: returns a group object with a specific ID and correct properties", async () => {
+      const allGroups = await Groups.find({});
+      const firstGroupId = String(allGroups[0]._id);
+
+      return request(app)
+        .get(`/api/groups/${firstGroupId}`)
+        .expect(200)
+        .then(({ body: { group } }) => {
+          console.log(group);
+          expect(group).toEqual(
+            expect.objectContaining({
+              _id: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              description: expect.any(String),
+              members: expect.anything,
+              member_count: expect.any(Number),
+              admin: expect.any(String),
+              thanks: expect.any(Number),
+            })
+          );
+        });
     });
   });
 });
