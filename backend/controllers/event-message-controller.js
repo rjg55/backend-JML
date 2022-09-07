@@ -11,7 +11,9 @@ exports.getAllMessagesByEventId = (req, res, next) => {
     .then((messages) => {
       res.status(200).send({ messages });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err.errors.message.properties);
+    });
 };
 
 //POST comment
@@ -35,7 +37,6 @@ exports.deleteMessage = (req, res, next) => {
       res.status(204).send();
     })
     .catch((err) => {
-      console.log(err);
-      next(err);
+      next(err.errors.message.properties);
     });
 };
