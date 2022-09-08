@@ -74,3 +74,16 @@ exports.addGroup = (title, category, description, admin) => {
     admin,
   });
 };
+
+exports.updateGroupByID = async (group_id, updatedGroupInfo) => {
+  const updatedGroup = await Groups.findOneAndUpdate(
+    { _id: group_id },
+    { ...updatedGroupInfo },
+    { new: true }
+  );
+
+  if (!updatedGroup) {
+    return Promise.reject({ status: 404, msg: "Not found" });
+  }
+  return updatedGroup;
+};

@@ -2,6 +2,7 @@ const {
   fetchAllGroups,
   fetchGroupById,
   addGroup,
+  updateGroupByID,
 } = require(`${__dirname}/../models/group-models.js`);
 
 exports.getAllGroups = (req, res, next) => {
@@ -32,5 +33,23 @@ exports.postGroup = (req, res, next) => {
       let allErrors = Object.keys(err.errors);
       let firstError = allErrors[0];
       next(err.errors[firstError].properties);
+    });
+};
+
+exports.patchGroupByID = (req, res, next) => {
+  const { group_id } = req.params;
+  const updatedGroupInfo = req.body;
+  updateGroupByID(group_id, updatedGroupInfo)
+    .then((updatedGroup) => {
+      res.status(200).send({ group: updatedGroup });
+    })
+    .catch((err) => {
+      if (err.errors) {
+        let allErrors = Object.keys(err.errors);
+        let firstError = allErrors[0];
+        next(err.errors[firstError].properties);
+      } else {
+        next(err);
+      }
     });
 };

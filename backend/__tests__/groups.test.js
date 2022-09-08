@@ -261,5 +261,60 @@ describe(" POST /api/groups", () => {
 });
 
 describe("PATCH /api/groups", () => {
-  test("status 200: updates a group with specific ID", () => {});
+  test("status 200: update group title with specific ID", async () => {
+    const allGroups = await Groups.find({});
+    const firstGroupId = String(allGroups[0]._id);
+
+    const updatedTitle = { title: "This is a new title" };
+
+    return request(app)
+      .patch(`/api/groups/${firstGroupId}`)
+      .send(updatedTitle)
+      .expect(200)
+      .then(({ body: { group } }) => {
+        expect(group.title).toEqual("This is a new title");
+        expect(group._id).toEqual(firstGroupId);
+      });
+  });
+  test("status 200: update another field in a group (description) with specific ID", async () => {
+    const allGroups = await Groups.find({});
+    const firstGroupId = String(allGroups[0]._id);
+
+    const updatedField = { description: "This is a new desc" };
+
+    return request(app)
+      .patch(`/api/groups/${firstGroupId}`)
+      .send(updatedField)
+      .expect(200)
+      .then(({ body: { group } }) => {
+        expect(group.description).toEqual("This is a new desc");
+        expect(group._id).toEqual(firstGroupId);
+      });
+  });
+  describe.only("PATCH - error handling", () => {
+    test("status 404 - not found - group_id does not exist", () => {
+      const updatedTitle = { title: "This is a new title" };
+
+      return request(app)
+        .patch(`/api/groups/123456789123456789123456`)
+        .send(updatedTitle)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("Not found");
+        });
+    });
+    test("status 400 - bad request - invalid id", async () => {
+      const updatedTitle = { title: undefined };
+
+      return request(app)
+        .patch(`/api/groups/13`)
+        .send(updatedTitle)
+        .expect(400)
+        .then((body) => {
+          expect(body.error.text).toEqual(
+            'Cast to ObjectId failed for value "13" (type string) at path "_id" for model "Group"'
+          );
+        });
+    });
+  });
 });
