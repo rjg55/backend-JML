@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { seedDB } = require(`${__dirname}/../seed.js`);
 const dotenv = require("dotenv");
 const request = require("supertest");
+const Groups = require(`../schemas/group-schema`);
 
 dotenv.config({
   path: `${__dirname}/../.env.test`,
@@ -38,15 +39,17 @@ describe("GET", () => {
           expect(Array.isArray(body.groups)).toBe(true);
           expect(body.groups.length).toBeGreaterThan(0);
           body.groups.forEach((group) => {
-            expect.objectContaining({
-              _id: expect.any(String),
-              title: expect.any(String),
-              category: expect.any(String),
-              description: expect.any(String),
-              members: expect.anything,
-              admin: expect.any(String),
-              thanks: expect.any(String),
-            });
+            expect(group).toEqual(
+              expect.objectContaining({
+                _id: expect.any(String),
+                title: expect.any(String),
+                category: expect.any(String),
+                description: expect.any(String),
+                members: expect.anything(),
+                admin: expect.any(String),
+                thanks: expect.any(Number),
+              })
+            );
           });
         });
     });
@@ -155,5 +158,190 @@ describe("GET", () => {
           });
       });
     });
+  });
+});
+
+describe("/api/groups/:id", () => {
+  describe("GET", () => {
+    test("status 200: returns a group object with a specific ID", async () => {
+      const allGroups = await Groups.find({});
+      const firstGroupId = allGroups[0]._id;
+
+      return request(app)
+        .get(`/api/groups/${firstGroupId}`)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.group._id).toEqual(String(firstGroupId));
+        });
+    });
+    test("status 200: returns a group object with a specific ID and correct properties", async () => {
+      const allGroups = await Groups.find({});
+      const firstGroupId = String(allGroups[0]._id);
+
+      return request(app)
+        .get(`/api/groups/${firstGroupId}`)
+        .expect(200)
+        .then(({ body: { group } }) => {
+          expect(group).toEqual(
+            expect.objectContaining({
+              _id: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              description: expect.any(String),
+              members: expect.anything(),
+              member_count: expect.any(Number),
+              admin: expect.any(String),
+              thanks: expect.any(Number),
+            })
+          );
+        });
+    });
+  });
+  test("Returns a status of 404 when given an ID which does not exist", () => {
+    return request(app)
+      .get(`/api/groups/123456789012345678901234`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+  test("Returns a status of 400 when given an invalid ID", () => {
+    return request(app)
+      .get(`/api/groups/123456`)
+      .expect(400)
+      .then(({ text }) => {
+        expect(text).toBe(
+          'Cast to ObjectId failed for value "123456" (type string) at path "_id" for model "Group"'
+        );
+      });
+  });
+});
+
+describe(" POST /api/groups", () => {
+  test("Returns a status of 201 and newly added group object", () => {
+    const addGroup = {
+      title: "Cow Lovers",
+      category: "leisure",
+      description: "We love cows and tipping them",
+      admin: "Cowpoke123",
+    };
+    return request(app)
+      .post("/api/groups")
+      .send(addGroup)
+      .expect(201)
+      .then(({ body: { newGroup } }) => {
+        expect(newGroup).toEqual(
+          expect.objectContaining({
+            _id: expect.any(String),
+            title: expect.any(String),
+            category: expect.any(String),
+            description: expect.any(String),
+            members: expect.anything(),
+            member_count: expect.any(Number),
+            admin: expect.any(String),
+            thanks: expect.any(Number),
+          })
+        );
+      });
+  });
+  test("Returns a status 400 when given a malformed body/missing fields/incorrect type", () => {
+    const addGroup = {
+      category: "leisure",
+      description: "We love cows and tipping them",
+      admin: "Cowpoke123",
+    };
+    return request(app)
+      .post("/api/groups")
+      .send(addGroup)
+      .expect(400)
+      .then(({ text }) => {
+        expect(text).toBe("Path `title` is required.");
+      });
+  });
+});
+
+describe("PATCH /api/groups", () => {
+  test("status 200: update group title with specific ID", async () => {
+    const allGroups = await Groups.find({});
+    const firstGroupId = String(allGroups[0]._id);
+
+    const updatedTitle = { title: "This is a new title" };
+
+    return request(app)
+      .patch(`/api/groups/${firstGroupId}`)
+      .send(updatedTitle)
+      .expect(200)
+      .then(({ body: { group } }) => {
+        expect(group.title).toEqual("This is a new title");
+        expect(group._id).toEqual(firstGroupId);
+      });
+  });
+  test("status 200: update another field in a group (description) with specific ID", async () => {
+    const allGroups = await Groups.find({});
+    const firstGroupId = String(allGroups[0]._id);
+
+    const updatedField = { description: "This is a new desc" };
+
+    return request(app)
+      .patch(`/api/groups/${firstGroupId}`)
+      .send(updatedField)
+      .expect(200)
+      .then(({ body: { group } }) => {
+        expect(group.description).toEqual("This is a new desc");
+        expect(group._id).toEqual(firstGroupId);
+      });
+  });
+  describe("PATCH - error handling", () => {
+    test("status 404 - not found - group_id does not exist", () => {
+      const updatedTitle = { title: "This is a new title" };
+
+      return request(app)
+        .patch(`/api/groups/123456789123456789123456`)
+        .send(updatedTitle)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("Not found");
+        });
+    });
+    test("status 400 - bad request - invalid id", async () => {
+      const updatedTitle = { title: undefined };
+
+      return request(app)
+        .patch(`/api/groups/13`)
+        .send(updatedTitle)
+        .expect(400)
+        .then((body) => {
+          expect(body.error.text).toEqual(
+            'Cast to ObjectId failed for value "13" (type string) at path "_id" for model "Group"'
+          );
+        });
+    });
+  });
+});
+
+describe("DELETE /api/groups/:group_id", () => {
+  test("returns a status of 204 and no content", async () => {
+    const allGroups = await Groups.find({});
+    const firstGroupId = String(allGroups[0]._id);
+
+    return request(app).delete(`/api/groups/${firstGroupId}`).expect(204);
+  });
+  test("returns a status of 404 if group does not exist", async () => {
+    return request(app)
+      .delete(`/api/groups/123456789012345678901234`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Not found");
+      });
+  });
+  test("status 400 - bad request - invalid id", async () => {
+    return request(app)
+      .delete(`/api/groups/13`)
+      .expect(400)
+      .then((body) => {
+        expect(body.error.text).toEqual(
+          `Cast to ObjectId failed for value \"{ _id: '13' }\" (type Object) at path \"_id\" for model \"Group\"`
+        );
+      });
   });
 });

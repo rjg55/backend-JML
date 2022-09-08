@@ -52,3 +52,48 @@ exports.fetchAllGroups = async (
   }
   return groupData;
 };
+
+exports.fetchGroupById = async (group_id) => {
+  const groupById = await Groups.find({ _id: group_id });
+
+  if (groupById.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "Not found",
+    });
+  }
+
+  return groupById[0];
+};
+
+exports.addGroup = (title, category, description, admin) => {
+  return Groups.create({
+    title,
+    category,
+    description,
+    admin,
+  });
+};
+
+exports.updateGroupByID = async (group_id, updatedGroupInfo) => {
+  const updatedGroup = await Groups.findOneAndUpdate(
+    { _id: group_id },
+    { ...updatedGroupInfo },
+    { new: true }
+  );
+
+  if (!updatedGroup) {
+    return Promise.reject({ status: 404, msg: "Not found" });
+  }
+  return updatedGroup;
+};
+
+exports.removeGroupByID = async (id) => {
+  const removedGroup = await Groups.findByIdAndDelete({ _id: id });
+
+  if (!removedGroup) {
+    return Promise.reject({ status: 404, msg: "Not found" });
+  }
+
+  return removedGroup;
+};
