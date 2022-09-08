@@ -6,7 +6,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handleValidationErrors = (err, req, res, next) => {
   if (err.message) {
-    res.status(400).send({ message: err.message });
+    res.status(400).send(err.message);
   } else next(err);
 };
 
