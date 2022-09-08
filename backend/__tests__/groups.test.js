@@ -291,7 +291,7 @@ describe("PATCH /api/groups", () => {
         expect(group._id).toEqual(firstGroupId);
       });
   });
-  describe.only("PATCH - error handling", () => {
+  describe("PATCH - error handling", () => {
     test("status 404 - not found - group_id does not exist", () => {
       const updatedTitle = { title: "This is a new title" };
 
@@ -316,5 +316,32 @@ describe("PATCH /api/groups", () => {
           );
         });
     });
+  });
+});
+
+describe("DELETE /api/groups/:group_id", () => {
+  test("returns a status of 204 and no content", async () => {
+    const allGroups = await Groups.find({});
+    const firstGroupId = String(allGroups[0]._id);
+
+    return request(app).delete(`/api/groups/${firstGroupId}`).expect(204);
+  });
+  test("returns a status of 404 if group does not exist", async () => {
+    return request(app)
+      .delete(`/api/groups/123456789012345678901234`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Not found");
+      });
+  });
+  test("status 400 - bad request - invalid id", async () => {
+    return request(app)
+      .delete(`/api/groups/13`)
+      .expect(400)
+      .then((body) => {
+        expect(body.error.text).toEqual(
+          `Cast to ObjectId failed for value \"{ _id: '13' }\" (type Object) at path \"_id\" for model \"Group\"`
+        );
+      });
   });
 });

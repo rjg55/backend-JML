@@ -87,3 +87,13 @@ exports.updateGroupByID = async (group_id, updatedGroupInfo) => {
   }
   return updatedGroup;
 };
+
+exports.removeGroupByID = async (id) => {
+  const removedGroup = await Groups.findByIdAndDelete({ _id: id });
+
+  if (!removedGroup) {
+    return Promise.reject({ status: 404, msg: "Not found" });
+  }
+
+  return removedGroup;
+};

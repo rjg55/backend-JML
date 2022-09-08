@@ -3,6 +3,7 @@ const {
   fetchGroupById,
   addGroup,
   updateGroupByID,
+  removeGroupByID,
 } = require(`${__dirname}/../models/group-models.js`);
 
 exports.getAllGroups = (req, res, next) => {
@@ -42,6 +43,24 @@ exports.patchGroupByID = (req, res, next) => {
   updateGroupByID(group_id, updatedGroupInfo)
     .then((updatedGroup) => {
       res.status(200).send({ group: updatedGroup });
+    })
+    .catch((err) => {
+      if (err.errors) {
+        let allErrors = Object.keys(err.errors);
+        let firstError = allErrors[0];
+        next(err.errors[firstError].properties);
+      } else {
+        next(err);
+      }
+    });
+};
+
+exports.deleteGroupByID = (req, res, next) => {
+  const { group_id: id } = req.params;
+
+  removeGroupByID(id)
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch((err) => {
       if (err.errors) {
