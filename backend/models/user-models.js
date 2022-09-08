@@ -1,6 +1,4 @@
-const User = require(`${__dirname}/../schemas/user-schema.js`);
-const fs = require("fs/promises");
-const { all } = require("../routes/user-routes");
+const Users = require(`${__dirname}/../schemas/user-schema.js`);
 
 exports.fetchAllUsers = async (sortBy = "username", order = "desc") => {
   const validSortBys = ["username"];
@@ -19,9 +17,26 @@ exports.fetchAllUsers = async (sortBy = "username", order = "desc") => {
   let allUsers = "";
 
   if (sortBy === undefined) {
-    allUsers = await User.find({});
+    allUsers = await Users.find({});
   } else {
-    allUsers = await User.find({}).sort([[sortBy, orderQuery]]);
+    allUsers = await Users.find({}).sort([[sortBy, orderQuery]]);
   }
   return allUsers;
+};
+
+exports.fetchUserById = async (_id) => {
+  const oneUser = await Users.findOne({ _id });
+  return oneUser;
+};
+
+exports.insertUser = (user) => {
+  return Users.create(user);
+};
+
+exports.removeUser = (_id) => {
+  return Users.findByIdAndDelete(_id);
+};
+
+exports.updateUser = (_id, userInfo) => {
+  return Users.findByIdAndUpdate(_id, { ...userInfo }, { new: true });
 };
