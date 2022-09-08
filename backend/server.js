@@ -8,6 +8,6 @@ require("dotenv").config({
 });
 
 connectDB();
-const { PORT = 9090 } = process.env || 5000;
+const { PORT = 8080 } = process.env || 5000;
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
