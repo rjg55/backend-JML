@@ -8,7 +8,8 @@
     "dev": "node backend/server.js",
     "server": "nodemon backend/server.js",
     "prepare": "husky install",
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "build": "npm build"
   },
   "repository": {
     "type": "git",
